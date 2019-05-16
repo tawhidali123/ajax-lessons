@@ -10,18 +10,17 @@
         searchedForText = searchField.value;
 
 
+        // unsplash ajax request
+        $.ajax({
+            url: `https://api.unsplash.com/search/photos?page=1&query=${searchedForText}`,
+            headers: {
+                Authorization: 'Client-ID 3fa69d468a0ea3881fa29f9dbe0228c45cba9aafb2a479b51200c1d7acfd8d1e'
+            }
+        }).done(addImage)
 
-        const unsplashRequest = new XMLHttpRequest();
-        // const searchedForText = '';
-        unsplashRequest.open('GET', `https://api.unsplash.com/search/photos?page=1&query=${searchedForText}`);
-        unsplashRequest.onload = addImage;
-        unsplashRequest.setRequestHeader('Authorization', 'Client-ID 3fa69d468a0ea3881fa29f9dbe0228c45cba9aafb2a479b51200c1d7acfd8d1e');
-        unsplashRequest.send();
-
-        function addImage(){
+        function addImage(images){
             let htmlContent = '';
-            const data = JSON.parse(this.responseText);
-            const firstImage = data.results[0];
+            const firstImage = images.results[0];
 
             htmlContent = `
                 <figure>
@@ -35,24 +34,19 @@
 
 
 
+        // NY times ajax request
+        $.ajax({
+            url: `http://api.nytimes.com/svc/search/v2/articlesearch.json?q=${searchedForText}&api-key=nANItMCLG9cQWCD7Pt5VvALpNwNzfIeh`
+        }).done(addArticles)
 
-        const articleRequest = new XMLHttpRequest();
-        articleRequest.open('GET', `http://api.nytimes.com/svc/search/v2/articlesearch.json?q=${searchedForText}&api-key=nANItMCLG9cQWCD7Pt5VvALpNwNzfIeh`);
-        articleRequest.onload = addArticles;
-        articleRequest.send();
-
-        function addArticles() {
-            // debugger;
-            console.log(this.responseText);
+        function addArticles(content) {
             let htmlContent = '';
-            const data = JSON.parse(this.responseText);
+            const data = content;
             let articles = data.response.docs.map(article => `
-                
-                    <li>
-                        <h2><a href='${article.web_url}'>${article.headline.main}</a></h2>
-                        <p>${article.snippet}</p>
-                    </li>
-                
+                <li>
+                    <h2><a href='${article.web_url}'>${article.headline.main}</a></h2>
+                    <p>${article.snippet}</p>
+                </li>   
             `);
 
             if(articles.length > 0) {
